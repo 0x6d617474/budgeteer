@@ -1,0 +1,23 @@
+version: '3.7'
+
+volumes:
+  database:
+
+services:
+  nginx:
+    image: budgeteer/nginx:latest
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    volumes:
+      - ..:/var/www
+    ports:
+    - 80:80
+    - 443:443
+  php-fpm:
+    image: budgeteer/php-fpm:latest
+    build:
+      context: .
+      dockerfile: ./php-fpm/Dockerfile
+    volumes:
+      - ..:/var/www
