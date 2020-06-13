@@ -9,6 +9,8 @@ services:
     build:
       context: .
       dockerfile: ./nginx/Dockerfile
+    depends_on:
+      - php-fpm
     volumes:
       - ..:/var/www
     ports:
@@ -19,5 +21,19 @@ services:
     build:
       context: .
       dockerfile: ./php-fpm/Dockerfile
+    depends_on:
+      - database
     volumes:
       - ..:/var/www
+  database:
+    image: mariadb:latest
+    environment:
+      MYSQL_USER: default
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: passwd
+      MYSQL_DATABASE: default
+      MYSQL_INITDB_SKIP_TZINFO: 1
+    volumes:
+      - database:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "--silent", "--password=passwd"]

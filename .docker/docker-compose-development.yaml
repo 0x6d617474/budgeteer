@@ -24,3 +24,13 @@ services:
       - ${SSH_AUTH_SOCK:-sockets}:/agents/ssh-agent
       - ${GPG_AGENT_SOCKET:-sockets}:/agents/gpg-agent
       - ${GPG_SSH_SOCKET:-sockets}:/agents/gpg-agent.ssh
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    depends_on:
+      - database
+    environment:
+      PMA_HOST: database
+    ports:
+      - 8080:80
+    volumes:
+      - /sessions
