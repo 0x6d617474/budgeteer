@@ -1,3 +1,12 @@
 .*
 !/.docker
+!.editorconfig
+!.env.example
+!.gitattributes
 !.gitignore
+!/public/.htaccess
+
+/node_modules
+/storage/*.key
+/vendor
+npm-debug.log
