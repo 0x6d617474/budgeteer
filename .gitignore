@@ -5,6 +5,7 @@
 !.gitattributes
 !.gitignore
 !.gitkeep
+!.php_cs
 !/public/.htaccess
 
 /node_modules
