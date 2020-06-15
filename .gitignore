@@ -4,6 +4,7 @@
 !.env.example
 !.gitattributes
 !.gitignore
+!.gitkeep
 !/public/.htaccess
 
 /node_modules
