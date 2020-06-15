@@ -10,6 +10,8 @@ RUN apt-get update && \
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/bin
 RUN install-php-extensions ldap pdo_mysql zip
 
+RUN yes | pecl install xdebug && docker-php-ext-enable xdebug
+
 ARG LUID=1000
 ENV LUID ${LUID}
 ARG LGID=1000
