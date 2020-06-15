@@ -1,0 +1,36 @@
+version: '3.7'
+
+volumes:
+  sockets:
+
+services:
+  workspace:
+    image: budgeteer/workspace:latest
+    build:
+      context: .
+      dockerfile: ./workspace/Dockerfile
+      args:
+        LUID: ${LUID:-1000}
+        LGID: ${LGID:-1000}
+        TARGET_PHP_VERSION: ${TARGET_PHP_VERSION:-7.4}
+        TARGET_NODE_VERSION: ${TARGET_NODE_VERSION:-14}
+    environment:
+      SSH_AUTH_SOCK: /agents/ssh-agent
+      GPG_AGENT_SOCKET: /agents/gpg-agent
+      GPG_SSH_SOCKET: /agents/gpg-agent.ssh
+    volumes:
+      - ..:/var/www
+      - ~/:/home/developer
+      - ${SSH_AUTH_SOCK:-sockets}:/agents/ssh-agent
+      - ${GPG_AGENT_SOCKET:-sockets}:/agents/gpg-agent
+      - ${GPG_SSH_SOCKET:-sockets}:/agents/gpg-agent.ssh
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    depends_on:
+      - database
+    environment:
+      PMA_HOST: database
+    ports:
+      - 8080:80
+    volumes:
+      - /sessions
