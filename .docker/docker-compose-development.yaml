@@ -4,6 +4,9 @@ volumes:
   sockets:
 
 services:
+  php-fpm:
+    volumes:
+    - ../.coverage:/opt/phpstorm-coverage/
   workspace:
     image: budgeteer/workspace:latest
     build:
