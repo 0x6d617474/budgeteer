@@ -7,6 +7,7 @@ use App\Domain\EventSourcing\Contracts\AggregateRoot;
 use App\Domain\EventSourcing\Contracts\AggregateRootRepository as Contract;
 use App\Domain\EventSourcing\Contracts\Event;
 use App\Domain\EventSourcing\Contracts\Message as MessageContract;
+use App\Domain\EventSourcing\Contracts\MessageDispatcher;
 use App\Domain\EventSourcing\Contracts\MessageRepository;
 use App\Domain\EventSourcing\MessageRepository\Message;
 use App\Domain\UUID;
@@ -20,9 +21,15 @@ final class AggregateRootRepository implements Contract
      */
     private $repository;
 
-    public function __construct(MessageRepository $repository)
+    /**
+     * @var \App\Domain\EventSourcing\Contracts\MessageDispatcher
+     */
+    private $dispatcher;
+
+    public function __construct(MessageRepository $repository, MessageDispatcher $dispatcher)
     {
         $this->repository = $repository;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -78,6 +85,8 @@ final class AggregateRootRepository implements Contract
         }
 
         $instance->commit();
+
+        $this->dispatcher->publish($messages);
     }
 
     /**

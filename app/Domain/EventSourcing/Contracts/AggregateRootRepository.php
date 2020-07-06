@@ -6,7 +6,7 @@ use App\Domain\UUID;
 
 interface AggregateRootRepository
 {
-    public function __construct(MessageRepository $repository);
+    public function __construct(MessageRepository $repository, MessageDispatcher $dispatcher);
 
     /**
      * Check to see if an aggregate root exists.

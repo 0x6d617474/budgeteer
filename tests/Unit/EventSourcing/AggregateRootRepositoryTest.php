@@ -7,6 +7,7 @@ use App\Domain\EventSourcing\AggregateRootRepository;
 use App\Domain\EventSourcing\Contracts\AggregateRoot;
 use App\Domain\EventSourcing\Contracts\Event;
 use App\Domain\EventSourcing\Contracts\Message;
+use App\Domain\EventSourcing\Contracts\MessageDispatcher;
 use App\Domain\EventSourcing\Contracts\MessageRepository;
 use App\Domain\UUID;
 use Tests\TestCase;
@@ -27,7 +28,10 @@ final class AggregateRootRepositoryTest extends TestCase
             $mock->shouldReceive('exists');
         });
 
-        $repository = new AggregateRootRepository($messageRepository);
+        /** @var MessageDispatcher $dispatcher */
+        $dispatcher = $this->mock(MessageDispatcher::class);
+
+        $repository = new AggregateRootRepository($messageRepository, $dispatcher);
         $repository->exists('__', UUID::generate());
     }
 
@@ -52,7 +56,10 @@ final class AggregateRootRepositoryTest extends TestCase
             $mock->shouldReceive('reconstitute')->withArgs([[$event]]);
         });
 
-        $repository = new AggregateRootRepository($messageRepository);
+        /** @var MessageDispatcher $dispatcher */
+        $dispatcher = $this->mock(MessageDispatcher::class);
+
+        $repository = new AggregateRootRepository($messageRepository, $dispatcher);
         $repository->load(\get_class($aggregate), UUID::generate());
     }
 
@@ -66,10 +73,13 @@ final class AggregateRootRepositoryTest extends TestCase
             $mock->shouldReceive('exists')->andReturn(false);
         });
 
+        /** @var MessageDispatcher $dispatcher */
+        $dispatcher = $this->mock(MessageDispatcher::class);
+
         $this->expectException(DomainException::class);
         $this->expectExceptionMessage('not found');
 
-        $repository = new AggregateRootRepository($messageRepository);
+        $repository = new AggregateRootRepository($messageRepository, $dispatcher);
         $repository->load('__', UUID::generate());
     }
 
@@ -88,7 +98,10 @@ final class AggregateRootRepositoryTest extends TestCase
             $mock->shouldReceive('getPendingEvents')->andReturn([]);
         });
 
-        $repository = new AggregateRootRepository($messageRepository);
+        /** @var MessageDispatcher $dispatcher */
+        $dispatcher = $this->mock(MessageDispatcher::class);
+
+        $repository = new AggregateRootRepository($messageRepository, $dispatcher);
         $repository->persist($aggregate, UUID::generate());
     }
 
@@ -122,7 +135,12 @@ final class AggregateRootRepositoryTest extends TestCase
             $mock->shouldReceive('commit');
         });
 
-        $repository = new AggregateRootRepository($messageRepository);
+        /** @var MessageDispatcher $dispatcher */
+        $dispatcher = $this->mock(MessageDispatcher::class, function ($mock) {
+            $mock->shouldReceive('publish');
+        });
+
+        $repository = new AggregateRootRepository($messageRepository, $dispatcher);
         $repository->persist($aggregate, UUID::generate());
     }
 
@@ -156,7 +174,12 @@ final class AggregateRootRepositoryTest extends TestCase
             $mock->shouldReceive('commit');
         });
 
-        $repository = new AggregateRootRepository($messageRepository);
+        /** @var MessageDispatcher $dispatcher */
+        $dispatcher = $this->mock(MessageDispatcher::class, function ($mock) {
+            $mock->shouldReceive('publish');
+        });
+
+        $repository = new AggregateRootRepository($messageRepository, $dispatcher);
         $repository->persist($aggregate, UUID::generate());
     }
 
@@ -178,10 +201,13 @@ final class AggregateRootRepositoryTest extends TestCase
             $mock->shouldReceive('getVersion')->andReturn(0);
         });
 
+        /** @var MessageDispatcher $dispatcher */
+        $dispatcher = $this->mock(MessageDispatcher::class);
+
         $this->expectException(DomainException::class);
         $this->expectExceptionMessage('Failed to persist');
 
-        $repository = new AggregateRootRepository($messageRepository);
+        $repository = new AggregateRootRepository($messageRepository, $dispatcher);
         $repository->persist($aggregate, UUID::generate());
     }
 }
