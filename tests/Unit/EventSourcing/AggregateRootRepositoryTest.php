@@ -25,7 +25,7 @@ final class AggregateRootRepositoryTest extends TestCase
     {
         /** @var MessageRepository $messageRepository */
         $messageRepository = $this->mock(MessageRepository::class, function ($mock) {
-            $mock->shouldReceive('exists');
+            $mock->expects('exists');
         });
 
         /** @var MessageDispatcher $dispatcher */
@@ -43,17 +43,17 @@ final class AggregateRootRepositoryTest extends TestCase
         $event = $this->mock(Event::class);
 
         $message = $this->mock(Message::class, function ($mock) use ($event) {
-            $mock->shouldReceive('getEvent')->andReturn($event);
+            $mock->expects('getEvent')->andReturn($event);
         });
 
         /** @var MessageRepository $messageRepository */
         $messageRepository = $this->mock(MessageRepository::class, function ($mock) use ($message) {
-            $mock->shouldReceive('exists')->andReturn(true);
-            $mock->shouldReceive('load')->andReturn([$message]);
+            $mock->expects('exists')->andReturn(true);
+            $mock->expects('load')->andReturn([$message]);
         });
 
         $aggregate = $this->mock(AggregateRoot::class, function ($mock) use ($event) {
-            $mock->shouldReceive('reconstitute')->withArgs([[$event]]);
+            $mock->expects('reconstitute')->withArgs([[$event]]);
         });
 
         /** @var MessageDispatcher $dispatcher */
@@ -70,7 +70,7 @@ final class AggregateRootRepositoryTest extends TestCase
     {
         /** @var MessageRepository $messageRepository */
         $messageRepository = $this->mock(MessageRepository::class, function ($mock) {
-            $mock->shouldReceive('exists')->andReturn(false);
+            $mock->expects('exists')->andReturn(false);
         });
 
         /** @var MessageDispatcher $dispatcher */
@@ -95,7 +95,7 @@ final class AggregateRootRepositoryTest extends TestCase
 
         /** @var AggregateRoot $aggregate */
         $aggregate = $this->mock(AggregateRoot::class, function ($mock) {
-            $mock->shouldReceive('getPendingEvents')->andReturn([]);
+            $mock->expects('getPendingEvents')->andReturn([]);
         });
 
         /** @var MessageDispatcher $dispatcher */
@@ -118,7 +118,7 @@ final class AggregateRootRepositoryTest extends TestCase
 
         /** @var MessageRepository $messageRepository */
         $messageRepository = $this->mock(MessageRepository::class, function ($mock) use ($events) {
-            $mock->shouldReceive('append')->andReturnUsing(function (string $streamId, array $messages) use ($events) {
+            $mock->expects('append')->andReturnUsing(function (string $streamId, array $messages) use ($events) {
                 /** @var Message[] $messages */
                 $this->assertSame(\count($events), \count($messages));
 
@@ -130,14 +130,14 @@ final class AggregateRootRepositoryTest extends TestCase
 
         /** @var AggregateRoot $aggregate */
         $aggregate = $this->mock(AggregateRoot::class, function ($mock) use ($events) {
-            $mock->shouldReceive('getPendingEvents')->andReturn($events);
-            $mock->shouldReceive('getVersion')->andReturn(\count($events));
-            $mock->shouldReceive('commit');
+            $mock->expects('getPendingEvents')->andReturn($events);
+            $mock->expects('getVersion')->andReturn(\count($events));
+            $mock->expects('commit');
         });
 
         /** @var MessageDispatcher $dispatcher */
         $dispatcher = $this->mock(MessageDispatcher::class, function ($mock) {
-            $mock->shouldReceive('publish');
+            $mock->expects('publish');
         });
 
         $repository = new AggregateRootRepository($messageRepository, $dispatcher);
@@ -159,7 +159,7 @@ final class AggregateRootRepositoryTest extends TestCase
 
         /** @var MessageRepository $messageRepository */
         $messageRepository = $this->mock(MessageRepository::class, function ($mock) use ($aggregateVersion) {
-            $mock->shouldReceive('append')->andReturnUsing(function (string $streamId, array $messages) use ($aggregateVersion) {
+            $mock->expects('append')->andReturnUsing(function (string $streamId, array $messages) use ($aggregateVersion) {
                 /** @var Message $message */
                 $message = end($messages);
 
@@ -169,14 +169,14 @@ final class AggregateRootRepositoryTest extends TestCase
 
         /** @var AggregateRoot $aggregate */
         $aggregate = $this->mock(AggregateRoot::class, function ($mock) use ($events, $aggregateVersion) {
-            $mock->shouldReceive('getPendingEvents')->andReturn($events);
-            $mock->shouldReceive('getVersion')->andReturn($aggregateVersion);
-            $mock->shouldReceive('commit');
+            $mock->expects('getPendingEvents')->andReturn($events);
+            $mock->expects('getVersion')->andReturn($aggregateVersion);
+            $mock->expects('commit');
         });
 
         /** @var MessageDispatcher $dispatcher */
         $dispatcher = $this->mock(MessageDispatcher::class, function ($mock) {
-            $mock->shouldReceive('publish');
+            $mock->expects('publish');
         });
 
         $repository = new AggregateRootRepository($messageRepository, $dispatcher);
@@ -190,15 +190,15 @@ final class AggregateRootRepositoryTest extends TestCase
     {
         /** @var MessageRepository $messageRepository */
         $messageRepository = $this->mock(MessageRepository::class, function ($mock) {
-            $mock->shouldReceive('append')->andThrow(
+            $mock->expects('append')->andThrow(
                 DomainException::persistanceError('__', UUID::generate(), new \Exception('TEST'))
             );
         });
 
         /** @var AggregateRoot $aggregate */
         $aggregate = $this->mock(AggregateRoot::class, function ($mock) {
-            $mock->shouldReceive('getPendingEvents')->andReturn([$this->mock(Event::class)]);
-            $mock->shouldReceive('getVersion')->andReturn(0);
+            $mock->expects('getPendingEvents')->andReturn([$this->mock(Event::class)]);
+            $mock->expects('getVersion')->andReturn(0);
         });
 
         /** @var MessageDispatcher $dispatcher */

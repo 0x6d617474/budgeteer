@@ -106,7 +106,7 @@ final class InMemoryMessageRepositoryTest extends TestCase
 
         for ($i = 1; $i <= $count; ++$i) {
             $messages[] = $this->mock(Message::class, function ($mock) use ($i) {
-                $mock->shouldReceive('getVersion')->andReturn($i);
+                $mock->allows('getVersion')->andReturn($i);
             });
         }
 

@@ -31,7 +31,7 @@ final class SynchronousMessageDispatcherTest extends TestCase
 
         /** @var MessageConsumer $subscriber */
         $subscriber = $this->mock(MessageConsumer::class, function ($mock) use ($messages) {
-            $mock->shouldReceive('handle')->withArgs($messages);
+            $mock->expects('handle')->withArgs($messages);
         });
 
         $dispatcher = new SynchronousMessageDispatcher([$subscriber]);
@@ -47,7 +47,7 @@ final class SynchronousMessageDispatcherTest extends TestCase
 
         /** @var MessageConsumer $subscriber */
         $subscriber = $this->mock(MessageConsumer::class, function ($mock) use ($messages) {
-            $mock->shouldReceive('handle')->withArgs($messages);
+            $mock->expects('handle')->withArgs($messages);
         });
 
         $dispatcher = new SynchronousMessageDispatcher();
@@ -63,7 +63,7 @@ final class SynchronousMessageDispatcherTest extends TestCase
         $messages = [];
         for ($i = 0; $i < 3; ++$i) {
             $messages[] = $this->mock(Message::class, function ($mock) use ($i) {
-                $mock->shouldReceive('getVersion')->andReturn($i);
+                $mock->expects('getVersion')->andReturn($i);
             });
         }
 
@@ -71,7 +71,7 @@ final class SynchronousMessageDispatcherTest extends TestCase
 
         /** @var MessageConsumer $subscriber */
         $subscriber = $this->mock(MessageConsumer::class, function ($mock) use (&$output) {
-            $mock->shouldReceive('handle')->andReturnUsing(function ($message) use (&$output) {
+            $mock->shouldReceive('handle')->atLeast()->once()->andReturnUsing(function ($message) use (&$output) {
                 $output .= $message->getVersion();
             });
         });
@@ -96,7 +96,7 @@ final class SynchronousMessageDispatcherTest extends TestCase
 
         for ($i = 0; $i < 3; ++$i) {
             $subscribers[] = $this->mock(MessageConsumer::class, function ($mock) use ($i, &$output) {
-                $mock->shouldReceive('handle')->andReturnUsing(function () use ($i, &$output) {
+                $mock->expects('handle')->andReturnUsing(function () use ($i, &$output) {
                     $output .= $i;
                 });
             });
@@ -119,12 +119,12 @@ final class SynchronousMessageDispatcherTest extends TestCase
 
         /** @var MessageConsumer $badguy */
         $badguy = $this->mock(MessageConsumer::class, function ($mock) {
-            $mock->shouldReceive('handle')->andThrow(new \Exception('TESTING'));
+            $mock->expects('handle')->andThrow(new \Exception('TESTING'));
         });
 
         /** @var MessageConsumer $goodguy */
         $goodguy = $this->mock(MessageConsumer::class, function ($mock) use (&$output) {
-            $mock->shouldReceive('handle')->andReturnUsing(function () use (&$output) {
+            $mock->expects('handle')->andReturnUsing(function () use (&$output) {
                 $output = 'handled';
             });
         });

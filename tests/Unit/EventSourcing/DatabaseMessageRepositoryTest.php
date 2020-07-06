@@ -69,8 +69,8 @@ final class DatabaseMessageRepositoryTest extends TestCase
 
         /** @var ConnectionInterface $connection */
         $connection = $this->mock(ConnectionInterface::class, function ($mock) {
-            $mock->shouldReceive('table')->andThrow(new QueryException('TESTING', [], new \Exception('_')));
-            $mock->shouldReceive('transaction')->andReturnUsing(function (callable $closure) {
+            $mock->expects('table')->andThrow(new QueryException('TESTING', [], new \Exception('_')));
+            $mock->expects('transaction')->andReturnUsing(function (callable $closure) {
                 return $closure();
             });
         });
@@ -156,12 +156,12 @@ final class DatabaseMessageRepositoryTest extends TestCase
 
         for ($i = 1; $i <= $count; ++$i) {
             $messages[] = $this->mock(Message::class, function ($mock) use ($i, $streamId) {
-                $mock->shouldReceive('getStreamId')->andReturn($streamId);
-                $mock->shouldReceive('getVersion')->andReturn($i);
-                $mock->shouldReceive('getTimestamp')->andReturn(time());
-                $mock->shouldReceive('getEvent')->andReturn($this->mock(Event::class, function ($mock) {
-                    $mock->shouldReceive('serialize')->andReturn([]);
-                    $mock->shouldReceive('deserialize')->andReturn($mock);
+                $mock->allows('getStreamId')->andReturn($streamId);
+                $mock->allows('getVersion')->andReturn($i);
+                $mock->allows('getTimestamp')->andReturn(time());
+                $mock->allows('getEvent')->andReturn($this->mock(Event::class, function ($mock) {
+                    $mock->allows('serialize')->andReturn([]);
+                    $mock->allows('deserialize')->andReturn($mock);
                 }));
             });
         }
